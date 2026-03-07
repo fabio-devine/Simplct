@@ -1,0 +1,39 @@
+# Documentation maintainer
+README.maintainer.md
+CHANGELOG.md
+
+# Build artifacts
+*.exe
+*.obj
+*.pdb
+*.ilk
+*.lib
+*.exp
+*.dll
+*.manifest
+*.idb
+*.ipdb
+*.iobj
+simplct
+obj/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Testing/
+CTestTestfile.cmake
+
+# macOS / debug artifacts
+.DS_Store
+*.dSYM
+
+# Windows system files
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# IDE files
+.idea/
+.vs/
+*.vcxproj.user
+*.sln.docstates
