@@ -23,6 +23,10 @@ cmake_install.cmake
 Testing/
 CTestTestfile.cmake
 
+# Test reports (generated, not committed)
+tests/reports/*.md
+tests/reports/xml/*.xml
+
 # macOS / debug artifacts
 .DS_Store
 *.dSYM

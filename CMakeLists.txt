@@ -29,17 +29,17 @@ option(ENABLE_VALIDATION_TESTS "Build validation test binaries" OFF)
 if(ENABLE_VALIDATION_TESTS)
     enable_testing()
 
-    # Auto-discover tests in the project root.
-    file(GLOB TEST_FILES CONFIGURE_DEPENDS "test_*.c")
+    # Auto-discover test sources in tests/.
+    file(GLOB TEST_FILES CONFIGURE_DEPENDS "tests/test_*.c")
 
-    # Ensure output directory exists for XML reports.
-    file(MAKE_DIRECTORY "${CMAKE_SOURCE_DIR}/test_reports")
+    # Ensure XML output directory exists.
+    file(MAKE_DIRECTORY "${CMAKE_SOURCE_DIR}/tests/reports/xml")
 
     foreach(TEST_FILE ${TEST_FILES})
         get_filename_component(TEST_NAME ${TEST_FILE} NAME_WE)
 
         add_executable(${TEST_NAME} ${TEST_FILE} ${LIB_SOURCES})
-        target_include_directories(${TEST_NAME} PRIVATE headers)
+        target_include_directories(${TEST_NAME} PRIVATE ${CMAKE_SOURCE_DIR} tests)
 
         # Discover UTEST() macros in each test source.
         file(READ ${TEST_FILE} TEST_SOURCE)
@@ -49,7 +49,7 @@ if(ENABLE_VALIDATION_TESTS)
             string(REGEX REPLACE "UTEST\\([ ]*([^, ]+)[ ]*,[ ]*([^) ]+)[ ]*\\)" "\\1.\\2" TEST_CASE "${MATCH}")
             add_test(
                 NAME ${TEST_NAME}.${TEST_CASE}
-                COMMAND ${TEST_NAME} --filter=${TEST_CASE} --output=${CMAKE_SOURCE_DIR}/test_reports/${TEST_NAME}.${TEST_CASE}.xml
+                COMMAND ${TEST_NAME} --filter=${TEST_CASE} --output=${CMAKE_SOURCE_DIR}/tests/reports/xml/${TEST_NAME}.${TEST_CASE}.xml
             )
             set_tests_properties(${TEST_NAME}.${TEST_CASE} PROPERTIES TIMEOUT 30 LABELS "unit")
         endforeach()
