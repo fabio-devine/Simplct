@@ -3,9 +3,9 @@
 This repository is the base for the simplCT compilation project.
 
 ## Team members
-- Student 1: `Fabio` `DEVINE` (< GitHub username >)
-- Student 2: `first name` `last name` (< GitHub username >)
-- Group: `group` (e.g. P1-INT)
+- Student 1: `Fabio` `DEVINE` (< fbdv94 >)
+- Student 2: `Lina` `AGHA` (< GitHub username >)
+- Group: `P1-INT1` (e.g. P1-INT)
 
 *Keep only the "Team members" section, from here you can modify your README to document your project*
 
@@ -42,3 +42,17 @@ This repository is the base for the simplCT compilation project.
 - The submitted code must remain your work.
 - You must be able to explain every part of the code.
 - Don't hesitate to ask for help from your teachers as soon as you are stuck (on code or on git)
+
+### Implementation Summary
+We built a lexer that reads the source code character by character using a `t_lexer` structure.
+We used helper functions (`peek_char`, `peek_next_char`, `advance_pos`) to safely move through the text.
+We created separate functions to recognize tokens:
+* identifiers and keywords
+* numbers
+* strings
+The `tokenize` function checks each character and calls the right function. It also handles operators and adds all tokens to a list.
+
+### Work Distribution
+We split the work evenly by doing one function out of two each.
+For the final function (`tokenize`), we worked together to complete and test it.
+
