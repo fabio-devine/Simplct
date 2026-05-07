@@ -47,6 +47,7 @@ void compile_primary(t_compiler* compiler) {
         add_push_instruction(compiler->code, atoi(compiler->previous->lexeme));
     }
     else if (match(compiler, TOKEN_STRING)) {
+        // Remplacement par add_var_instruction pour utiliser OP_PUSH_STR
         add_var_instruction(compiler->code, OP_PUSH_STR, compiler->previous->lexeme);
     }
     else if (match(compiler, TOKEN_ID)) {
@@ -105,86 +106,40 @@ void compile_expression(t_compiler* compiler) {
     compile_equality(compiler);
 }
 
+
 /* ============================================
    STATEMENT COMPILATION
    ============================================ */
 
 void compile_let_statement(t_compiler* compiler) {
-    expect(compiler, TOKEN_ID, "Nom de variable attendu.");
-    char* name = strdup(compiler->previous->lexeme);
-    expect(compiler, TOKEN_ASSIGN, "'=' attendu.");
-    compile_expression(compiler);
-    expect(compiler, TOKEN_SEMICOLON, "';' attendu.");
-    add_var_instruction(compiler->code, OP_STORE_VAR, name);
-    free(name);
+    // TODO: consume TOKEN_ID, TOKEN_ASSIGN, compile_expression, TOKEN_SEMICOLON, emit OP_STORE_VAR
+    (void)compiler;
 }
 
 void compile_print_statement(t_compiler* compiler) {
-    expect(compiler, TOKEN_LPAREN, "'(' attendue.");
-    compile_expression(compiler);
-
-    while (match(compiler, TOKEN_COMMA)) {
-        add_simple_instruction(compiler->code, OP_PRINT_NO_NEWLINE);
-        add_var_instruction(compiler->code, OP_PUSH_STR, " ");
-        add_simple_instruction(compiler->code, OP_PRINT_NO_NEWLINE);
-        compile_expression(compiler);
-    }
-
-    expect(compiler, TOKEN_RPAREN, "')' attendue.");
-    expect(compiler, TOKEN_SEMICOLON, "';' attendu.");
-    add_simple_instruction(compiler->code, OP_PRINT);
+    // TODO: consume TOKEN_LPAREN, compile expression(s), emit OP_PRINT / OP_PRINT_NO_NEWLINE
+    (void)compiler;
 }
 
 void compile_if_statement(t_compiler* compiler) {
-    expect(compiler, TOKEN_LPAREN, "'(' attendue.");
-    compile_expression(compiler);
-    expect(compiler, TOKEN_RPAREN, "')' attendue.");
-
-    int jump_address = compiler->code->count;
-    add_simple_instruction(compiler->code, OP_JUMP_IF_FALSE);
-    compile_block(compiler);
-    get_instruction_at(compiler->code, jump_address)->operand = compiler->code->count;
+    // TODO: compile condition, emit OP_JUMP_IF_FALSE placeholder, compile block, backpatch
+    (void)compiler;
 }
 
 void compile_while_statement(t_compiler* compiler) {
-    int start_address = compiler->code->count;
-    expect(compiler, TOKEN_LPAREN, "'(' attendue.");
-    compile_expression(compiler);
-    expect(compiler, TOKEN_RPAREN, "')' attendue.");
-    int exit_jump_address = compiler->code->count;
-    add_simple_instruction(compiler->code, OP_JUMP_IF_FALSE);
-    compile_block(compiler);
-    t_bytecode_instruction jump_back;
-    jump_back.opcode = OP_JUMP;
-    jump_back.operand = start_address;
-    jump_back.operand_str = NULL;
-    add_instruction(compiler->code, &jump_back);
-
-    get_instruction_at(compiler->code, exit_jump_address)->operand = compiler->code->count;
+    // TODO: save loop_start, compile condition, emit OP_JUMP_IF_FALSE placeholder,
+    //       compile block, emit OP_JUMP loop_start, backpatch
+    (void)compiler;
 }
 
 void compile_block(t_compiler* compiler) {
-    expect(compiler, TOKEN_LBRACE, "'{' attendue.");
-    while (!check(compiler, TOKEN_RBRACE) && !check(compiler, TOKEN_EOF)) {
-        compile_statement(compiler);
-    }
-    expect(compiler, TOKEN_RBRACE, "'}' attendue.");
+    // TODO: consume TOKEN_LBRACE, loop compile_statement until TOKEN_RBRACE, consume TOKEN_RBRACE
+    (void)compiler;
 }
 
 void compile_statement(t_compiler* compiler) {
-    if (match(compiler, TOKEN_LET)) compile_let_statement(compiler);
-    else if (match(compiler, TOKEN_IF)) compile_if_statement(compiler);
-    else if (match(compiler, TOKEN_WHILE)) compile_while_statement(compiler);
-    else if (match(compiler, TOKEN_PRINT)) compile_print_statement(compiler);
-    else if (match(compiler, TOKEN_ID)) {
-        // Affectation : x = ...
-        char* name = strdup(compiler->previous->lexeme);
-        expect(compiler, TOKEN_ASSIGN, "'=' attendu.");
-        compile_expression(compiler);
-        expect(compiler, TOKEN_SEMICOLON, "';' attendu.");
-        add_var_instruction(compiler->code, OP_STORE_VAR, name);
-        free(name);
-    }
+    // TODO: dispatch to the right compile_*_statement based on the current token
+    (void)compiler;
 }
 
 /* ============================================
@@ -192,13 +147,12 @@ void compile_statement(t_compiler* compiler) {
    ============================================ */
 
 t_bytecode* compile(t_token_list* tokens) {
-    t_compiler compiler = {0};
-    if (tokens) compiler.current = tokens->head;
-    compiler.code = create_bytecode();
-    while (!check(&compiler, TOKEN_EOF)) {
-        compile_statement(&compiler);
-        if (compiler.had_error) break;
-    }
-    add_simple_instruction(compiler.code, OP_HALT);
-    return compiler.code;
+    // TODO:
+    // 1. Check tokens is not NULL
+    // 2. Initialise t_compiler (current, previous, code, had_error)
+    // 3. Loop compile_statement until TOKEN_EOF
+    // 4. Emit OP_HALT
+    // 5. Return compiler.code (or NULL on error)
+    (void)tokens;
+    return NULL;
 }
