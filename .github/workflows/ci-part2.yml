@@ -1,0 +1,50 @@
+# Validation workflow — Part 2 (manual trigger only)
+#
+# This workflow is NOT triggered automatically on push or pull request.
+# It must be started manually from the GitHub Actions tab by the teacher or TA
+# after the submission deadline.
+#
+# How to trigger:
+#   GitHub repository → Actions → "Part 2 – Validation tests" → Run workflow
+#
+# Why manual-only:
+#   With ~200 student repositories, automatic CI would consume too many
+#   GitHub Actions minutes. Trigger once per group after the deadline.
+
+name: Part 2 – Validation tests
+
+on:
+  workflow_dispatch:
+
+jobs:
+  validate:
+    name: Build and run compiler tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure (tests enabled)
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Debug -DENABLE_VALIDATION_TESTS=ON
+
+      - name: Build
+        run: cmake --build build
+
+      - name: Run tests
+        run: ctest --test-dir build -R "^test_compiler\." --output-on-failure
+
+      - name: Generate feedback reports
+        if: always()
+        run: |
+          mkdir -p tests/reports/xml
+          bash tests/report_utils/generate_test_report.sh \
+            tests/reports/xml test_compiler tests/reports/feedback_part2.md
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports-part2
+          path: tests/reports/
+          if-no-files-found: ignore

@@ -25,7 +25,13 @@ TEST_PREFIX="$2"
 OUTPUT_FILE="$3"
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-TRANSLATIONS_FR="$SCRIPT_DIR/report_translations.fr.tsv"
+# Use a prefix-specific translations file if it exists, otherwise fall back to the default.
+_prefix_tsv="$SCRIPT_DIR/report_translations_${TEST_PREFIX}.fr.tsv"
+if [ -f "$_prefix_tsv" ]; then
+    TRANSLATIONS_FR="$_prefix_tsv"
+else
+    TRANSLATIONS_FR="$SCRIPT_DIR/report_translations.fr.tsv"
+fi
 
 # Build sibling filenames
 if [ "${OUTPUT_FILE##*.}" = "md" ]; then
