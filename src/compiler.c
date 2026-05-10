@@ -116,34 +116,88 @@ void compile_expression(t_compiler* compiler) {
    ============================================ */
 
 void compile_let_statement(t_compiler* compiler) {
-    // TODO: consume TOKEN_ID, TOKEN_ASSIGN, compile_expression, TOKEN_SEMICOLON, emit OP_STORE_VAR
-    (void)compiler;
+    expect(compiler, TOKEN_ID, "Expected variable name after 'let'.");
+    char* var_name = compiler->previous->lexeme;
+    expect(compiler, TOKEN_ASSIGN, "Expected '=' after variable name.");
+    compile_expression(compiler);
+    expect(compiler, TOKEN_SEMICOLON, "Expected ';' after let statement.");
+    add_var_instruction(compiler->code, OP_STORE_VAR, var_name);
 }
 
 void compile_print_statement(t_compiler* compiler) {
-    // TODO: consume TOKEN_LPAREN, compile expression(s), emit OP_PRINT / OP_PRINT_NO_NEWLINE
-    (void)compiler;
+    expect(compiler, TOKEN_LPAREN, "Expected '(' after 'print'.");
+
+    compile_expression(compiler);
+
+    while (match(compiler, TOKEN_COMMA)) {
+        add_simple_instruction(compiler->code, OP_PRINT_NO_NEWLINE);
+
+        t_bytecode_instruction* space = create_instruction(OP_PUSH_STR, 0, " ");
+        add_instruction(compiler->code, space);
+        add_simple_instruction(compiler->code, OP_PRINT_NO_NEWLINE);
+
+        compile_expression(compiler);
+    }
+
+    add_simple_instruction(compiler->code, OP_PRINT);
+
+    expect(compiler, TOKEN_RPAREN, "Expected ')' after print arguments.");
+    expect(compiler, TOKEN_SEMICOLON, "Expected ';' after print statement.");
 }
 
 void compile_if_statement(t_compiler* compiler) {
-    // TODO: compile condition, emit OP_JUMP_IF_FALSE placeholder, compile block, backpatch
-    (void)compiler;
+    expect(compiler, TOKEN_LPAREN, "Expected '(' after 'if'.");
+    compile_expression(compiler);
+    expect(compiler, TOKEN_RPAREN, "Expected ')' after condition.");
+
+    // Émettre un saut conditionnel avec une adresse temporaire (0)
+    add_instruction(compiler->code, create_instruction(OP_JUMP_IF_FALSE, 0, NULL));
+    int jump_instr_index = compiler->code->count - 1;
+
+    compile_block(compiler);
+
+    // Backpatching : mettre à jour l'adresse du saut vers l'instruction après le bloc
+    t_bytecode_instruction* jump_instr = get_instruction_at(compiler->code, jump_instr_index);
+    jump_instr->operand = compiler->code->count;
 }
 
 void compile_while_statement(t_compiler* compiler) {
-    // TODO: save loop_start, compile condition, emit OP_JUMP_IF_FALSE placeholder,
-    //       compile block, emit OP_JUMP loop_start, backpatch
-    (void)compiler;
+    int loop_start = compiler->code->count;
+    expect(compiler, TOKEN_LPAREN, "Expected '(' after 'while'.");
+    compile_expression(compiler);
+    expect(compiler, TOKEN_RPAREN, "Expected ')' after condition.");
+
+    add_instruction(compiler->code, create_instruction(OP_JUMP_IF_FALSE, 0, NULL));
+    int exit_jump_index = compiler->code->count - 1;
+
+    compile_block(compiler);
+
+    // Retour au début de la boucle
+    add_instruction(compiler->code, create_instruction(OP_JUMP, loop_start, NULL));
+
+    // Backpatching du saut de sortie
+    t_bytecode_instruction* exit_jump = get_instruction_at(compiler->code, exit_jump_index);
+    exit_jump->operand = compiler->code->count;
 }
 
 void compile_block(t_compiler* compiler) {
-    // TODO: consume TOKEN_LBRACE, loop compile_statement until TOKEN_RBRACE, consume TOKEN_RBRACE
-    (void)compiler;
+    expect(compiler, TOKEN_LBRACE, "Expected '{' to start block.");
+    while (!check(compiler, TOKEN_RBRACE) && !check(compiler, TOKEN_EOF)) {
+        compile_statement(compiler);
+    }
+    expect(compiler, TOKEN_RBRACE, "Expected '}' after block.");
 }
 
 void compile_statement(t_compiler* compiler) {
-    // TODO: dispatch to the right compile_*_statement based on the current token
-    (void)compiler;
+    if (match(compiler, TOKEN_LET)) compile_let_statement(compiler);
+    else if (match(compiler, TOKEN_PRINT)) compile_print_statement(compiler);
+    else if (match(compiler, TOKEN_IF)) compile_if_statement(compiler);
+    else if (match(compiler, TOKEN_WHILE)) compile_while_statement(compiler);
+    else if (check(compiler, TOKEN_LBRACE)) compile_block(compiler);
+    else {
+        compile_expression(compiler);
+        expect(compiler, TOKEN_SEMICOLON, "Expected ';' after expression.");
+    }
 }
 
 /* ============================================
