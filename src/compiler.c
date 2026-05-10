@@ -205,12 +205,19 @@ void compile_statement(t_compiler* compiler) {
    ============================================ */
 
 t_bytecode* compile(t_token_list* tokens) {
-    // TODO:
-    // 1. Check tokens is not NULL
-    // 2. Initialise t_compiler (current, previous, code, had_error)
-    // 3. Loop compile_statement until TOKEN_EOF
-    // 4. Emit OP_HALT
-    // 5. Return compiler.code (or NULL on error)
-    (void)tokens;
-    return NULL;
+    if (!tokens || !tokens->head) return NULL;
+    t_compiler compiler;
+    compiler.current = tokens->head;
+    compiler.previous = NULL;
+    compiler.code = create_bytecode();
+    compiler.had_error = 0;
+    while (!check(&compiler, TOKEN_EOF)) {
+        compile_statement(&compiler);
+    }
+    add_simple_instruction(compiler.code, OP_HALT);
+    if (compiler.had_error) {
+        free_bytecode(compiler.code);
+        return NULL;
+    }
+    return compiler.code;
 }
