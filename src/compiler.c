@@ -44,21 +44,25 @@ static void expect(t_compiler* compiler, t_token_type type, const char* message)
 
 void compile_primary(t_compiler* compiler) {
     if (match(compiler, TOKEN_INT)) {
-        add_push_instruction(compiler->code, atoi(compiler->previous->lexeme));
+        int value = atoi(compiler->previous->lexeme);
+        add_push_instruction(compiler->code, value);
     }
     else if (match(compiler, TOKEN_STRING)) {
-        // Remplacement par add_var_instruction pour utiliser OP_PUSH_STR
-        add_var_instruction(compiler->code, OP_PUSH_STR, compiler->previous->lexeme);
+        t_bytecode_instruction* instr = create_instruction(OP_PUSH_STR, 0, compiler->previous->lexeme);
+        add_instruction(compiler->code, instr);
     }
     else if (match(compiler, TOKEN_ID)) {
         add_var_instruction(compiler->code, OP_LOAD_VAR, compiler->previous->lexeme);
     }
     else if (match(compiler, TOKEN_LPAREN)) {
         compile_expression(compiler);
-        expect(compiler, TOKEN_RPAREN, "Parenthèse fermante ')' attendue.");
+        expect(compiler, TOKEN_RPAREN, "Expected ')' after expression.");
     }
     else {
+        fprintf(stderr, "Compilation Error at line %d: Expected expression.\n",
+                compiler->current ? compiler->current->line : 0);
         compiler->had_error = 1;
+        advance(compiler);
     }
 }
 
@@ -90,7 +94,7 @@ void compile_comparison(t_compiler* compiler) {
         else if (op == TOKEN_GT) add_simple_instruction(compiler->code, OP_GT);
         else if (op == TOKEN_LTE) add_simple_instruction(compiler->code, OP_LTE);
         else add_simple_instruction(compiler->code, OP_GTE);
-           }
+    }
 }
 
 void compile_equality(t_compiler* compiler) {
