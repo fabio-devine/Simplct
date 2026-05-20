@@ -56,3 +56,43 @@ The `tokenize` function checks each character and calls the right function. It a
 We split the work evenly by doing one function out of two each.
 For the final function (`tokenize`), we worked together to complete and test it.
 
+
+Project Goals
+
+The goal of the simplCT project is to develop a small compiler/interpreter for a simplified programming language inspired by C.
+The project helps understand the different stages involved in how a programming language works: lexical analysis, bytecode compilation, and execution through a virtual machine.
+
+In this part of the project, I implemented:
+the lexer used to transform source code into tokens,
+the compiler that generates bytecode,
+the management of expressions and statements (let, print, if, while),
+the execution of the program inside the virtual machine.
+
+Architecture
+
+The project is divided into several modules:
+lexer.c: transforms the source code into a list of tokens.
+token.c: manages token-related structures and functions.
+compiler.c: parses tokens and generates bytecode instructions.
+bytecode.c: contains the structures representing bytecode instructions.
+vm.c: executes the generated instructions.
+environment.c: manages variables and their storage.
+io_utils.c: contains utility functions for input/output operations.
+
+The global workflow is the following:
+
+The lexer reads the source code.
+The tokens are sent to the compiler.
+The compiler generates bytecode.
+The virtual machine executes the bytecode.
+Work Distribution
+
+I completed the project alone.
+
+Use of AI
+
+I used ChatGPT occasionally to help understand the origin of certain bugs and better interpret some compilation error messages and project behavior.
+
+Known Bugs and Limitations
+String management remains limited.
+The simplCT language is intentionally minimal and does not support some advanced features found in real compilers.
