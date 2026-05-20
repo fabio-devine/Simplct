@@ -1,0 +1,13 @@
+let a = 48;
+let b = 36;
+print "Calcul of GCD";
+while (a != b) {
+    if (a > b) {
+        let a = a - b;
+    }
+    if (b > a) {
+        let b = b - a;
+    }
+}
+print "Answer :";
+print a;
