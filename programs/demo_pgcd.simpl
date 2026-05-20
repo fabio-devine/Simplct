@@ -1,13 +1,20 @@
 let a = 48;
 let b = 36;
+
 print("Calcul of GCD");
+
 while (a != b) {
+
     if (a > b) {
-        let a = a - b;
+        let temp = a - b;
+        let a = temp;
     }
+
     if (b > a) {
-        let b = b - a;
+        let temp = b - a;
+        let b = temp;
     }
 }
+
 print("Answer :");
 print(a);
