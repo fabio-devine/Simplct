@@ -62,7 +62,7 @@ int main(int argc, char** argv) {
         printf(
             "Type: %d | Value: %s | Line: %d\n",
             current_token->type,
-            current_token->value,
+            current_token->value ? current_token->value : "NULL",
             current_token->line
         );
 
