@@ -43,7 +43,7 @@ This repository is the base for the simplCT compilation project.
 - You must be able to explain every part of the code.
 - Don't hesitate to ask for help from your teachers as soon as you are stuck (on code or on git)
 
-### Implementation Summary
+### Partie 1 : Implementation Summary
 We built a lexer that reads the source code character by character using a `t_lexer` structure.
 We used helper functions (`peek_char`, `peek_next_char`, `advance_pos`) to safely move through the text.
 We created separate functions to recognize tokens:
@@ -51,10 +51,6 @@ We created separate functions to recognize tokens:
 * numbers
 * strings
 The `tokenize` function checks each character and calls the right function. It also handles operators and adds all tokens to a list.
-
-### Work Distribution
-We split the work evenly by doing one function out of two each.
-For the final function (`tokenize`), we worked together to complete and test it.
 
 
 Project Goals
