@@ -58,14 +58,11 @@ int main(int argc, char** argv) {
     t_token* current_token = tokens->head;
 
     while (current_token) {
-
         printf(
-            "Type: %d | Value: %s | Line: %d\n",
+            "Type: %d | Line: %d\n",
             current_token->type,
-            current_token->value ? current_token->value : "NULL",
             current_token->line
         );
-
         current_token = current_token->next;
     }
 
