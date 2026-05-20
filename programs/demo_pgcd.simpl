@@ -1,6 +1,6 @@
 let a = 48;
 let b = 36;
-print "Calcul of GCD";
+print("Calcul of GCD");
 while (a != b) {
     if (a > b) {
         let a = a - b;
@@ -9,5 +9,5 @@ while (a != b) {
         let b = b - a;
     }
 }
-print "Answer :";
-print a;
+print("Answer :");
+print(a);
