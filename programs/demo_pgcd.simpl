@@ -1,20 +1,13 @@
 let a = 48;
 let b = 36;
-
-print("Calcul of GCD");
-
-while (a != b) {
-
-    if (a > b) {
-        let temp = a - b;
-        let a = temp;
+let x = a;
+let y = b;
+while (x != y) {
+    if (x > y) {
+        x = x - y;
     }
-
-    if (b > a) {
-        let temp = b - a;
-        let b = temp;
+    if (x < y) {
+        y = y - x;
     }
 }
-
-print("Answer :");
-print(a);
+print("GCD(48, 36) =", x);

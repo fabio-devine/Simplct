@@ -1,17 +1,16 @@
-let max = 20;
 let n = 2;
-while (n <= max) {
+while (n <= 20) {
     let d = 2;
-    let prime = 1;
-    while (d < n) {
-        if (n - (n / d) * d == 0) {
-            let prime = 0;
+    let p = 1;
+    while (d <= n - 1) {
+        let r = n - (n / d) * d;
+        if (r == 0) {
+            p = 0;
         }
-        let d = d + 1;
+        d = d + 1;
     }
-    if (prime == 1) {
-        print n;
-        print " is prime";
+    if (p == 1) {
+        print(n, "is prime");
     }
-    let n = n + 1;
+    n = n + 1;
 }

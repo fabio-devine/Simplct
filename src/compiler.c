@@ -149,14 +149,9 @@ void compile_if_statement(t_compiler* compiler) {
     expect(compiler, TOKEN_LPAREN, "Expected '(' after 'if'.");
     compile_expression(compiler);
     expect(compiler, TOKEN_RPAREN, "Expected ')' after condition.");
-
-    // Émettre un saut conditionnel avec une adresse temporaire (0)
     add_instruction(compiler->code, create_instruction(OP_JUMP_IF_FALSE, 0, NULL));
     int jump_instr_index = compiler->code->count - 1;
-
     compile_block(compiler);
-
-    // Backpatching : mettre à jour l'adresse du saut vers l'instruction après le bloc
     t_bytecode_instruction* jump_instr = get_instruction_at(compiler->code, jump_instr_index);
     jump_instr->operand = compiler->code->count;
 }
@@ -166,16 +161,10 @@ void compile_while_statement(t_compiler* compiler) {
     expect(compiler, TOKEN_LPAREN, "Expected '(' after 'while'.");
     compile_expression(compiler);
     expect(compiler, TOKEN_RPAREN, "Expected ')' after condition.");
-
     add_instruction(compiler->code, create_instruction(OP_JUMP_IF_FALSE, 0, NULL));
     int exit_jump_index = compiler->code->count - 1;
-
     compile_block(compiler);
-
-    // Retour au début de la boucle
     add_instruction(compiler->code, create_instruction(OP_JUMP, loop_start, NULL));
-
-    // Backpatching du saut de sortie
     t_bytecode_instruction* exit_jump = get_instruction_at(compiler->code, exit_jump_index);
     exit_jump->operand = compiler->code->count;
 }
@@ -194,9 +183,21 @@ void compile_statement(t_compiler* compiler) {
     else if (match(compiler, TOKEN_IF)) compile_if_statement(compiler);
     else if (match(compiler, TOKEN_WHILE)) compile_while_statement(compiler);
     else if (check(compiler, TOKEN_LBRACE)) compile_block(compiler);
-    else {
+    else if (check(compiler, TOKEN_ID) &&
+             compiler->current->next &&
+             compiler->current->next->type == TOKEN_ASSIGN) {
+        advance(compiler);
+        char* var_name = compiler->previous->lexeme;
+        expect(compiler, TOKEN_ASSIGN, "Expected '=' after variable name.");
         compile_expression(compiler);
         expect(compiler, TOKEN_SEMICOLON, "Expected ';' after expression.");
+        add_var_instruction(compiler->code, OP_STORE_VAR, var_name);
+             }
+    else {
+        fprintf(stderr, "Compilation Error at line %d: Unexpected token.\n",
+                compiler->current ? compiler->current->line : 0);
+        compiler->had_error = 1;
+        advance(compiler);
     }
 }
 
