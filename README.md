@@ -1,94 +1,284 @@
-# Project simplCT [EN]
+# simplCT — A Mini Compiler and Virtual Machine in C
 
-This repository is the base for the simplCT compilation project.
+**simplCT** is a lightweight compiler and interpreter project written in C. It implements the core stages of a programming language execution pipeline: lexical analysis, compilation into bytecode, and execution through a custom stack-based virtual machine.
 
-## Team members
-- Student 1: `Fabio` `DEVINE` (< fbdv94 >)
-- Student 2: `Lina` `AGHA` (< GitHub username >)
-- Group: `P1-INT1` (e.g. P1-INT)
+The project explores how source code is transformed into executable instructions, from recognizing tokens to evaluating expressions and controlling program flow.
 
-*Keep only the "Team members" section, from here you can modify your README to document your project*
+## Overview
 
-## Quick start
-- A CMakeLists.txt is provided to allow immediate compilation in CLion or command line with CMake.
+Rather than relying on an existing interpreter, simplCT implements its own language-processing components. Source programs written in the simplified `.simpl` language are read, tokenized, compiled into bytecode instructions, and executed by a virtual machine.
 
-## Git best practices (working in pairs)
-### 1. Work with small branches
-- Create a branch per task: `feat/lexer-tokenize`, `fix/lexer-errors`, etc.
-- Avoid doing everything directly on `main`.
+The program also displays the original source code, the generated tokens, the bytecode, and the execution result, making the different stages easier to inspect and understand.
 
-### 2. Make small, readable commits
-- One commit = one idea.
-- Recommended message:
-  - `feat: add tokenize loop skeleton`
-  - `fix: handle unterminated string token`
-  - `refactor: split scan_number helper`
+## Features
 
-### 3. Push often
-- Always test and validate locally before pushing.
-- Push your branch regularly to avoid losing work. 
-- This also makes it easier for your partner to review.
+- **Lexical analysis:** Reads source code character by character and identifies keywords, identifiers, integer literals, strings, operators, and delimiters.
+- **Expression compilation:** Compiles arithmetic and comparison expressions using a precedence-based parsing structure.
+- **Bytecode generation:** Converts supported language constructs into an intermediate instruction sequence.
+- **Stack-based virtual machine:** Executes bytecode using an operand stack and an instruction pointer.
+- **Variable management:** Stores and retrieves variables through an environment implemented with linked lists.
+- **Arithmetic operations:** Supports addition, subtraction, multiplication, and division.
+- **Comparison operations:** Implements equality, inequality, and relational comparisons.
+- **Control flow:** Supports conditional statements (`if`) and loops (`while`), using jump instructions in the bytecode.
+- **Output instructions:** Prints values and supports output instructions with or without a trailing newline.
+- **Modular architecture:** Separates lexical analysis, compilation, bytecode, execution, variable management, and input/output utilities.
+- **Automated validation tests:** Includes C-based tests for the lexer and compiler, integrated with CMake and CTest.
 
-### 4. Review before merging
-- Open a Pull Request (PR) even in pairs.
-- Review the modified files before validation.
-- This helps catch mistakes and ensures both partners understand the changes.
+## Architecture
 
-### 5. Sync before continuing
-- Before coding a new task: **always** pull the latest changes before starting.
-- This avoids conflicts and ensures you are working on the most up-to-date base.
+The execution pipeline follows three main stages.
 
-## Reminder
-- The submitted code must remain your work.
-- You must be able to explain every part of the code.
-- Don't hesitate to ask for help from your teachers as soon as you are stuck (on code or on git)
+```text
+Source Code (.simpl)
+        |
+        v
++------------------+
+|      Lexer       |
+|  Source -> Tokens|
++------------------+
+        |
+        v
++------------------+
+|     Compiler     |
+| Tokens -> Bytecode
++------------------+
+        |
+        v
++------------------+
+| Virtual Machine  |
+| Execute Bytecode |
++------------------+
+        |
+        v
+   Program Output
+```
 
-### Partie 1 : Implementation Summary
-We built a lexer that reads the source code character by character using a `t_lexer` structure.
-We used helper functions (`peek_char`, `peek_next_char`, `advance_pos`) to safely move through the text.
-We created separate functions to recognize tokens:
-* identifiers and keywords
-* numbers
-* strings
-The `tokenize` function checks each character and calls the right function. It also handles operators and adds all tokens to a list.
+### 1. Lexical Analysis
 
+The lexer scans the source code and converts it into a linked list of tokens. It recognizes language keywords, identifiers, integer and string literals, operators, and delimiters.
 
-Project Goals
+Helper functions manage character access, position tracking, and line numbers.
 
-The goal of the simplCT project is to develop a small compiler/interpreter for a simplified programming language inspired by C.
-The project helps understand the different stages involved in how a programming language works: lexical analysis, bytecode compilation, and execution through a virtual machine.
+### 2. Compilation
 
-In this part of the project, I implemented:
-the lexer used to transform source code into tokens,
-the compiler that generates bytecode,
-the management of expressions and statements (let, print, if, while),
-the execution of the program inside the virtual machine.
+The compiler processes the token list and generates bytecode instructions. Expressions are handled through a precedence-based sequence of parsing functions, while statements generate the instructions required for variable assignment, output, conditionals, and loops.
 
-Architecture
+Jump instructions are used to represent control flow.
 
-The project is divided into several modules:
-lexer.c: transforms the source code into a list of tokens.
-token.c: manages token-related structures and functions.
-compiler.c: parses tokens and generates bytecode instructions.
-bytecode.c: contains the structures representing bytecode instructions.
-vm.c: executes the generated instructions.
-environment.c: manages variables and their storage.
-io_utils.c: contains utility functions for input/output operations.
+### 3. Virtual Machine
 
-The global workflow is the following:
+The virtual machine executes the generated bytecode using a stack and an instruction pointer. It maintains an environment for variables and implements arithmetic, comparisons, output, and control-flow instructions.
 
-The lexer reads the source code.
-The tokens are sent to the compiler.
-The compiler generates bytecode.
-The virtual machine executes the bytecode.
-Work Distribution
+The program prints the generated bytecode before executing it, allowing the compilation process to be inspected.
 
-I completed the project alone.
+## Supported Language Constructs
 
-Use of AI
+The `.simpl` language currently includes constructs such as:
 
-I used ChatGPT occasionally to help understand the origin of certain bugs and better interpret some compilation error messages and project behavior.
+| Construct | Example |
+|---|---|
+| Variable declaration | `let x = 10;` |
+| Arithmetic expressions | `let result = x + y;` |
+| Output | `print(result);` |
+| String output | `print("Hello");` |
+| Conditional statement | `if (x < y) { ... }` |
+| Loop | `while (x < 10) { ... }` |
+| Comparisons | `==`, `!=`, `<`, `>`, `<=`, `>=` |
+| Arithmetic operators | `+`, `-`, `*`, `/` |
 
-Known Bugs and Limitations
-String management remains limited.
-The simplCT language is intentionally minimal and does not support some advanced features found in real compilers.
+The language is intentionally small and is not intended to provide the full feature set of C or another general-purpose programming language.
+
+## Example
+
+The following program calculates the sum of two integers:
+
+```c
+let x = 10;
+let y = 5;
+let result = x + y;
+print(result);
+```
+
+Save the code in a file named `example.simpl`.
+
+When the program is executed, simplCT displays the source code, the token list, the generated bytecode, and the execution result. The expected printed value is:
+
+```text
+15
+```
+
+## Project Structure
+
+```text
+Simplct/
+├── main.c
+├── CMakeLists.txt
+├── run_tests.sh
+├── headers/
+│   ├── bytecode.h
+│   ├── compiler.h
+│   ├── environment.h
+│   ├── io_utils.h
+│   ├── lexer.h
+│   ├── token.h
+│   └── vm.h
+├── src/
+│   ├── bytecode.c
+│   ├── compiler.c
+│   ├── environment.c
+│   ├── io_utils.c
+│   ├── lexer.c
+│   ├── token.c
+│   └── vm.c
+├── programs/
+│   ├── demo_pgcd.simpl
+│   ├── demo_prime.simpl
+│   ├── test_simple.simpl
+│   ├── test_if.simpl
+│   ├── test_while.simpl
+│   └── ...
+├── tests/
+│   ├── test_compiler.c
+│   ├── test_lexer.c
+│   ├── utest.h
+│   └── report_utils/
+└── .github/
+    └── workflows/
+```
+
+### Main Components
+
+| File or directory | Responsibility |
+|---|---|
+| `main.c` | Entry point and orchestration of the execution pipeline |
+| `src/lexer.c` | Lexical analysis and token recognition |
+| `src/token.c` | Token creation, storage, and cleanup |
+| `src/compiler.c` | Parsing supported expressions and statements; bytecode generation |
+| `src/bytecode.c` | Bytecode instruction representation and manipulation |
+| `src/vm.c` | Stack-based bytecode execution |
+| `src/environment.c` | Variable storage and lookup |
+| `src/io_utils.c` | Source-file input and I/O utilities |
+| `headers/` | Public declarations, structures, and interfaces |
+| `programs/` | Example and validation programs written in `.simpl` |
+| `tests/` | Lexer and compiler validation tests |
+
+## Technologies
+
+- **C (C11):** Core implementation of the language-processing pipeline.
+- **CMake:** Build configuration and project management.
+- **CTest:** Test discovery and execution.
+- **Git and GitHub:** Version control and project hosting.
+- **CLion:** Development environment.
+
+The project uses a custom implementation of its lexer, compiler, bytecode representation, and virtual machine rather than depending on an external language runtime for these stages.
+
+## Getting Started
+
+### Prerequisites
+
+- A C compiler supporting C11, such as GCC or Clang.
+- CMake 3.24 or newer.
+- Git (to clone the repository).
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/fabio-devine/Simplct.git
+cd Simplct
+```
+
+### 2. Configure the build
+
+```bash
+cmake -S . -B build
+```
+
+### 3. Compile the project
+
+```bash
+cmake --build build
+```
+
+This creates the `simplct` executable in the build directory.
+
+### 4. Run a program
+
+From the repository root, run:
+
+```bash
+./build/simplct programs/test_simple.simpl
+```
+
+On Windows, the executable may be located at `build/Debug/simplct.exe` or another configuration-specific path, depending on the generator used by CMake.
+
+The program expects exactly one command-line argument: the path to a `.simpl` source file.
+
+For development in CLion, open the repository's `CMakeLists.txt`, allow CLion to configure the project, build the `simplct` target, and provide a `.simpl` file path as a program argument in the run configuration.
+
+## Running the Tests
+
+The repository contains separate validation tests for the lexer and compiler. These can be enabled through CMake.
+
+Configure the project with validation tests enabled:
+
+```bash
+cmake -S . -B build-tests -DENABLE_VALIDATION_TESTS=ON
+```
+
+Build the executable and test targets:
+
+```bash
+cmake --build build-tests
+```
+
+Run the test suite:
+
+```bash
+ctest --test-dir build-tests --output-on-failure
+```
+
+Alternatively, on Linux or macOS, the provided script can build and run the validation tests:
+
+```bash
+./run_tests.sh part1
+```
+
+For compiler tests:
+
+```bash
+./run_tests.sh part2
+```
+
+The test script uses a CMake build directory named `cmake-build-debug` and generates test reports under `tests/reports/`.
+
+**Note:** The presence of tests does not, by itself, guarantee that every test passes on every platform or configuration. Run the commands above to verify the current state of the project.
+
+## Limitations
+
+simplCT is an educational mini compiler rather than a production-ready language implementation.
+
+- The language supports a deliberately limited set of statements and expressions.
+- String handling is limited compared with a full programming language.
+- The implementation does not provide the complete feature set of C, such as general-purpose functions, arrays, or a full type system.
+- Error handling and language validation remain simpler than in industrial compilers.
+
+These constraints keep the project focused on the fundamentals of lexical analysis, compilation, bytecode, and virtual-machine execution.
+
+## Learning Objectives
+
+This project explores several fundamental systems-programming concepts:
+
+- Designing a lexer and token representation.
+- Implementing expression parsing and operator precedence.
+- Translating source constructs into bytecode.
+- Building a stack-based execution engine.
+- Managing variables and dynamically allocated data in C.
+- Organizing a multi-module C project with header files.
+- Configuring builds and automated tests with CMake and CTest.
+
+## Author
+
+**Fabio Devine**
+
+Developed as part of a university programming project.
+
